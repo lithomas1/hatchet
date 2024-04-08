@@ -12,6 +12,8 @@ from glob import glob
 import pytest
 import numpy as np
 
+from hatchet import GraphFrame
+
 
 @pytest.fixture
 def data_dir():
@@ -213,6 +215,20 @@ def sparse_tau_profile_dir(data_dir, tmpdir):
     return tau_dir
 
 
+# TODO: we shouldn't require tau in order to run the sparse tests
+# We should create a sparse GF from literal, once we have sparse
+# literal data
+@pytest.fixture
+def sparse_profile_data(data_dir, tmpdir):
+    tau_dir = os.path.join(data_dir, "lulesh-tau-64-fdef-profiledir-5")
+
+    for f in glob(tau_dir + "/*"):
+        shutil.copy(f, str(tmpdir))
+
+    return GraphFrame.from_tau(str(tau_dir))
+
+
+
 @pytest.fixture
 def scorep_profile_cubex(data_dir, tmpdir):
     """Builds a temporary directory containing the Score-P profiles."""
@@ -394,6 +410,20 @@ def mock_graph_literal():
     ]
 
     return graph_dict
+
+
+@pytest.fixture
+def mock_graph_gf(mock_graph_literal):
+    return GraphFrame.from_literal(mock_graph_literal)
+
+
+# Note: can't parametrize a fixture with fixtures
+# we're hacking around this by using indices
+@pytest.fixture(params=[0,1], ids=["dense", "sparse"])
+def sparse_and_dense_gfs(mock_graph_gf, sparse_profile_data, request):
+    if request.param == 0:
+        return mock_graph_gf
+    return sparse_profile_data
 
 
 @pytest.fixture

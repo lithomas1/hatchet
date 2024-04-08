@@ -22,8 +22,8 @@ from hatchet.node import Node
 from hatchet.external.console import ConsoleRenderer
 
 
-def test_copy(mock_graph_literal):
-    gf = GraphFrame.from_literal(mock_graph_literal)
+def test_copy(sparse_and_dense_gfs):
+    gf = sparse_and_dense_gfs
     other = gf.copy()
 
     assert gf.graph is other.graph
@@ -35,8 +35,8 @@ def test_copy(mock_graph_literal):
     assert gf.metadata == other.metadata
 
 
-def test_deepcopy(mock_graph_literal):
-    gf = GraphFrame.from_literal(mock_graph_literal)
+def test_deepcopy(sparse_and_dense_gfs):
+    gf = sparse_and_dense_gfs
     other = gf.deepcopy()
 
     assert gf.graph == other.graph
@@ -57,9 +57,40 @@ def test_drop_index_levels(calc_pi_hpct_db):
     assert num_nodes == num_rows
 
 
+# Note: creating a separate test for sparse data since
+# the literal dense GF from sparse_and_dense_gfs doesn't
+# have levels
+def test_sparse_drop_index_levels(sparse_tau_profile_dir):
+    gf = GraphFrame.from_tau(str(sparse_tau_profile_dir))
+    num_nodes = len(gf.graph)
+
+    gf.drop_index_levels()
+    num_rows = len(gf.dataframe.index)
+
+    assert num_nodes == num_rows
+
+
 def test_unify_hpctoolkit_data(calc_pi_hpct_db):
     gf1 = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_db))
     gf2 = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_db))
+
+    assert gf1.graph is not gf2.graph
+    # indexes are the same since we are reading in the same dataset
+    assert all(gf1.dataframe.index == gf2.dataframe.index)
+
+    gf1.unify(gf2)
+
+    assert gf1.graph is gf2.graph
+
+    # Indexes should still be the same after unify. Sort indexes before comparing.
+    gf1.dataframe.sort_index(inplace=True)
+    gf2.dataframe.sort_index(inplace=True)
+    assert all(gf1.dataframe.index == gf2.dataframe.index)
+
+
+def test_unify_sparse_tau_data(sparse_tau_profile_dir):
+    gf1 = GraphFrame.from_tau(str(sparse_tau_profile_dir))
+    gf2 = GraphFrame.from_tau(str(sparse_tau_profile_dir))
 
     assert gf1.graph is not gf2.graph
     # indexes are the same since we are reading in the same dataset

@@ -133,8 +133,10 @@ def test_sparse_tree(sparse_tau_profile_dir):
         allreduce_node_df.xs((1, 0), level=[1, 2])
 
 
-def test_children(tau_profile_dir):
-    gf = GraphFrame.from_tau(str(tau_profile_dir))
+@pytest.mark.parametrize("profile_dir",
+                         [tau_profile_dir, sparse_tau_profile_dir])
+def test_children(profile_dir):
+    gf = GraphFrame.from_tau(str(profile_dir))
     root = gf.graph.roots
     root_children = [
         "MPI_Init()",
