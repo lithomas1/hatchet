@@ -211,33 +211,33 @@ class ConsoleRenderer:
 
     def render_frame(self, node, dataframe, indent="", child_indent=""):
         node_depth = node._depth
-        # set dataframe index based on whether rank and thread are part of
-        # the MultiIndex
-        if "rank" in dataframe.index.names and "thread" in dataframe.index.names:
-            df_index = (node, self.rank, self.thread)
-        elif "rank" in dataframe.index.names:
-            df_index = (node, self.rank)
-        elif "thread" in dataframe.index.names:
-            df_index = (node, self.thread)
-        else:
-            df_index = node
-
         node_metadict = self.meta_cb(node)
 
-        node_metric = np.nan
-
-        # Set rendered_tree_node to True to let the caller know
-        # that we rendered at least 1 node
-        try:
-            node_metric = dataframe.loc[df_index, self.primary_metric]
-            self.rendered_tree_node = True
-        except KeyError:
-            # node/rank/thread combo doesn't exist
-            pass
-
-        # If rank/thread combo doesn't exist, it didn't run on that rank/thread combo
-        # and we shouldn't display it
         if node_depth <= self.depth:
+            # set dataframe index based on whether rank and thread are part of
+            # the MultiIndex
+            if "rank" in dataframe.index.names and "thread" in dataframe.index.names:
+                df_index = (node, self.rank, self.thread)
+            elif "rank" in dataframe.index.names:
+                df_index = (node, self.rank)
+            elif "thread" in dataframe.index.names:
+                df_index = (node, self.thread)
+            else:
+                df_index = node
+
+            # Check if rank/thread combo ran this node
+            # if not we show nan
+            node_metric = np.nan
+
+            # Set rendered_tree_node to True to let the caller know
+            # that we rendered at least 1 node
+            try:
+                node_metric = dataframe.loc[df_index, self.primary_metric]
+                self.rendered_tree_node = True
+            except KeyError:
+                # node/rank/thread combo doesn't exist
+                pass
+
             metric_precision = "{:." + str(self.precision) + "f}"
             metric_str = (
                 self._ansi_color_for_metric(node_metric)
@@ -282,7 +282,7 @@ class ConsoleRenderer:
             if "_missing_node" in dataframe.columns:
                 result += lr_decorator
             if self.context in dataframe.columns:
-                context = node_metadict["file"]
+                context = node_metadict[self.context]
                 result += " {c.faint}{context}{c.end}\n".format(
                     context=context, c=self.colors
                 )
@@ -293,41 +293,29 @@ class ConsoleRenderer:
                 indents = {"├": "├─ ", "│": "│  ", "└": "└─ ", " ": "   "}
             else:
                 indents = {"├": "|- ", "│": "|  ", "└": "`- ", " ": "   "}
+
+            # using a list for visited also ensures that we never revisit nodes in the case of
+            # large complex graphs
+            if node not in self.visited:
+                self.visited.append(node)
+                # TODO: probably better to sort by time
+                sorted_children = sorted(node.children, key=lambda n: n.frame)
+                if sorted_children:
+                    last_child = sorted_children[-1]
+
+                for child in sorted_children:
+                    if child is not last_child:
+                        c_indent = child_indent + indents["├"]
+                        cc_indent = child_indent + indents["│"]
+                    else:
+                        c_indent = child_indent + indents["└"]
+                        cc_indent = child_indent + indents[" "]
+                    result += self.render_frame(
+                        child, dataframe, indent=c_indent, child_indent=cc_indent
+                    )
         else:
             result = ""
             indents = {"├": "", "│": "", "└": "", " ": ""}
-
-        # Note: we still have to recurse even if
-        # we didn't render the current node because the specified rank/thread
-        # could run code from our child nodes
-
-        # using a list for visited also ensures that we never revisit nodes in the case of
-        # large complex graphs
-        if node not in self.visited and node_depth <= self.depth:
-            self.visited.append(node)
-            # TODO: probably better to sort by time
-            sorted_children = sorted(node.children, key=lambda n: n.frame)
-            if sorted_children:
-                last_child = sorted_children[-1]
-
-            for child in sorted_children:
-                if child is not last_child:
-                    c_indent = child_indent
-                    cc_indent = child_indent
-                    if node_metric is not None:
-                        # Only add the child indents if we rendered the current node
-                        c_indent += indents["├"]
-                        cc_indent += indents["│"]
-                else:
-                    c_indent = child_indent
-                    cc_indent = child_indent
-                    if node_metric is not None:
-                        # Only add the child indents if we rendered the current node
-                        c_indent += indents["└"]
-                        cc_indent += indents[" "]
-                result += self.render_frame(
-                    child, dataframe, indent=c_indent, child_indent=cc_indent
-                )
 
         return result
 

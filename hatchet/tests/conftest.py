@@ -192,7 +192,7 @@ def hatchet_pyinstrument_json(data_dir, tmpdir):
 
 
 @pytest.fixture
-def tau_profile_dir(data_dir, tmpdir, request):
+def tau_profile_dir(data_dir, tmpdir):
     """Builds a temporary directory containing the TAU profiles."""
     tau_dir = os.path.join(data_dir, "tau-cpi-mpi")
 
