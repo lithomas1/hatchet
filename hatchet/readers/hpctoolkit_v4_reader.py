@@ -1247,6 +1247,7 @@ class CCTReader:
         meta_reader: MetaReader,
         profile_reader: ProfileReader,
         defaults_reader: DefaultReader,
+        sparse_format: bool = False,
     ) -> None:
         # open file
         self.file = open(file_location, "rb")
@@ -1261,6 +1262,8 @@ class CCTReader:
         self.byte_order = "little"
         self.signed = False
         self.encoding = "ASCII"
+
+        self.sparse_format = sparse_format
 
         # The cct.db header consists of the common .db header and n sections.
         # We're going to do a little set up work, so that's easy to change if
@@ -1617,20 +1620,23 @@ class CCTReader:
 
                 # fills all the metric values in not visited profiles
                 # with 0.
-                self.__create_node_dict(
-                    dummy_identifier,
-                    dummy_profile_info,
-                    node_name,
-                    node,
-                    context_info,
-                    metric_names=visited_metrics,
-                    value=0,
-                )
+
+                if not self.sparse_format:
+                    self.__create_node_dict(
+                        dummy_identifier,
+                        dummy_profile_info,
+                        node_name,
+                        node,
+                        context_info,
+                        metric_names=visited_metrics,
+                        value=0,
+                    )
 
 
 class HPCToolkitV4Reader:
-    def __init__(self, directory: str) -> None:
+    def __init__(self, directory: str, sparse_format: bool = False) -> None:
         self.directory = directory
+        self.sparse_format = sparse_format
 
     def read(self):
         self.meta_reader: MetaReader = MetaReader(self.directory + "/meta.db")
@@ -1645,6 +1651,7 @@ class HPCToolkitV4Reader:
             self.meta_reader,
             self.profile_reader,
             self.defaults_reader,
+            sparse_format=self.sparse_format,
         )
 
         return self.create_graphframe()
