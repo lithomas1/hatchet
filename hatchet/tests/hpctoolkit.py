@@ -239,6 +239,7 @@ def test_inclusive_time_calculation(data_dir, calc_pi_hpct_db):
 def test_graphframe_v4(data_dir, calc_pi_hpct_v4_db, sparse_format):
     """Sanity test a GraphFrame object with known data."""
     gf = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_v4_db), sparse_format=sparse_format)
+    df = gf.dataframe
 
     for col in gf.dataframe.columns:
         if col in gf.inc_metrics or col in gf.exc_metrics:
@@ -251,9 +252,14 @@ def test_graphframe_v4(data_dir, calc_pi_hpct_v4_db, sparse_format):
     # In case of sparse format check to make sure we are not inserting dummy values
     # into the dataframe
     if sparse_format:
-        assert 0 not in gf.dataframe["time (inc)"]
+        assert 0 not in df["time (inc)"]
         # Data specific checks
-        assert len(gf.dataframe.reset_index()) == 461
+        assert len(df.reset_index()) == 461
+
+        first_node = df.index.get_level_values("node")[0]
+        # only 1 rank/thread ran
+        assert len(df.loc[first_node] == 1)
+        assert df.loc[(first_node, 0, 3), "time (inc)"] == 0.011382
     else:
         assert len(gf.dataframe.reset_index()) == 3280
 
