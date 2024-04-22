@@ -1609,7 +1609,9 @@ class CCTReader:
         # remove the visited profiles.
         if not self.sparse_format:
             not_visited_profiles = [
-                i for j, i in enumerate(not_visited_profiles) if j not in visited_profiles
+                i
+                for j, i in enumerate(not_visited_profiles)
+                if j not in visited_profiles
             ]
 
             # iterate over the not visited nodes and create dummy instances.
