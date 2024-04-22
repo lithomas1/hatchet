@@ -1607,21 +1607,20 @@ class CCTReader:
             )
 
         # remove the visited profiles.
-        not_visited_profiles = [
-            i for j, i in enumerate(not_visited_profiles) if j not in visited_profiles
-        ]
+        if not self.sparse_format:
+            not_visited_profiles = [
+                i for j, i in enumerate(not_visited_profiles) if j not in visited_profiles
+            ]
 
-        # iterate over the not visited nodes and create dummy instances.
-        for profile in not_visited_profiles:
-            hit_pointer = profile["hit_pointer"]
-            if hit_pointer != 0:
-                dummy_profile_info = self.profile_reader.hit_map[hit_pointer]
-                dummy_identifier = (node,) + tuple(dummy_profile_info.values())
+            # iterate over the not visited nodes and create dummy instances.
+            for profile in not_visited_profiles:
+                hit_pointer = profile["hit_pointer"]
+                if hit_pointer != 0:
+                    dummy_profile_info = self.profile_reader.hit_map[hit_pointer]
+                    dummy_identifier = (node,) + tuple(dummy_profile_info.values())
 
-                # fills all the metric values in not visited profiles
-                # with 0.
-
-                if not self.sparse_format:
+                    # fills all the metric values in not visited profiles
+                    # with 0.
                     self.__create_node_dict(
                         dummy_identifier,
                         dummy_profile_info,
