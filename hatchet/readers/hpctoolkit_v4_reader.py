@@ -1607,6 +1607,7 @@ class CCTReader:
             )
 
         # remove the visited profiles.
+        # TODO: remove this code when sparse output format is the default
         if not self.sparse_format:
             not_visited_profiles = [
                 i

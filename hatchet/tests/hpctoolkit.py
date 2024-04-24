@@ -62,9 +62,9 @@ procedures = [
 ]
 
 
-def test_graphframe(data_dir, calc_pi_hpct_db, sparse_format):
+def test_graphframe(data_dir, calc_pi_hpct_db):
     """Sanity test a GraphFrame object with known data."""
-    gf = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_db), sparse_format=sparse_format)
+    gf = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_db))
 
     assert len(gf.dataframe.groupby("module")) == 5
     assert len(gf.dataframe.groupby("file")) == 11
@@ -237,9 +237,9 @@ def test_inclusive_time_calculation(data_dir, calc_pi_hpct_db):
 
 # TODO: remove False option once sparse is only option in next major release
 @pytest.mark.parametrize("sparse_format", [False, True])
-def test_graphframe_v4(data_dir, calc_pi_hpct_v4_db):
+def test_graphframe_v4(data_dir, calc_pi_hpct_v4_db, sparse_format):
     """Sanity test a GraphFrame object with known data."""
-    gf = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_v4_db))
+    gf = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_v4_db), sparse_format=sparse_format)
     df = gf.dataframe
 
     for col in gf.dataframe.columns:
