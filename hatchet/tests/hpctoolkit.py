@@ -239,7 +239,9 @@ def test_inclusive_time_calculation(data_dir, calc_pi_hpct_db):
 @pytest.mark.parametrize("sparse_format", [False, True])
 def test_graphframe_v4(data_dir, calc_pi_hpct_v4_db, sparse_format):
     """Sanity test a GraphFrame object with known data."""
-    gf = GraphFrame.from_hpctoolkit(str(calc_pi_hpct_v4_db), sparse_format=sparse_format)
+    gf = GraphFrame.from_hpctoolkit(
+        str(calc_pi_hpct_v4_db), sparse_format=sparse_format
+    )
     df = gf.dataframe
 
     for col in gf.dataframe.columns:
