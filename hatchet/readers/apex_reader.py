@@ -15,24 +15,152 @@ import json
 
 class ApexReader:
     """Create a GraphFrame from a directory of APEX tasktree output JSON files.
-    Example input:
-    { "frame": {"name": "APEX MAIN", "type": "function", "rank": 0}, "metrics": {"time": 0.341264, "time (inc)": 0.341896, "min (inc)": 0.341896, "max (inc)": 0.341896, "sumsqr (inc)": 0.116893, "calls": 1.000000}, "children": [
-     { "frame": {"name": "main", "type": "function", "rank": 0}, "metrics": {"time": 0.000059, "time (inc)": 0.000632, "min (inc)": 0.000632, "max (inc)": 0.000632, "sumsqr (inc)": 0.000000, "calls": 1.000000}, "children": [
-      { "frame": {"name": "root_node", "type": "function", "rank": 0}, "metrics": {"time": 0.000217, "time (inc)": 0.000452, "min (inc)": 0.000452, "max (inc)": 0.000452, "sumsqr (inc)": 0.000000, "calls": 1.000000}, "children": [
-       { "frame": {"name": "MPI_Recv", "type": "function", "rank": 0}, "metrics": {"time": 0.000027, "time (inc)": 0.000027, "min (inc)": 0.000002, "max (inc)": 0.000018, "sumsqr (inc)": 0.000000, "calls": 3.000000} },
-       { "frame": {"name": "do_work", "type": "function", "rank": 0}, "metrics": {"time": 0.000111, "time (inc)": 0.000111, "min (inc)": 0.000111, "max (inc)": 0.000111, "sumsqr (inc)": 0.000000, "calls": 1.000000} },
-       { "frame": {"name": "MPI_Send", "type": "function", "rank": 0}, "metrics": {"time": 0.000019, "time (inc)": 0.000019, "min (inc)": 0.000002, "max (inc)": 0.000008, "sumsqr (inc)": 0.000000, "calls": 6.000000} },
-       { "frame": {"name": "get_next_work_item", "type": "function", "rank": 0}, "metrics": {"time": 0.000068, "time (inc)": 0.000079, "min (inc)": 0.000006, "max (inc)": 0.000031, "sumsqr (inc)": 0.000000, "calls": 8.000000}, "children": [
-        { "frame": {"name": "get_work_items", "type": "function", "rank": 0}, "metrics": {"time": 0.000011, "time (inc)": 0.000011, "min (inc)": 0.000011, "max (inc)": 0.000011, "sumsqr (inc)": 0.000000, "calls": 1.000000} }
-       ]
-       }
-      ]
-      },
-      { "frame": {"name": "MPI_Barrier", "type": "function", "rank": 0}, "metrics": {"time": 0.000120, "time (inc)": 0.000120, "min (inc)": 0.000017, "max (inc)": 0.000103, "sumsqr (inc)": 0.000000, "calls": 2.000000} }
-     ]
-     }
-    ]
-    }
+
+    Example input::
+
+        {
+        "frame": {
+            "name": "APEX MAIN",
+            "type": "function",
+            "rank": 0
+        },
+        "metrics": {
+            "time": 0.341264,
+            "time (inc)": 0.341896,
+            "min (inc)": 0.341896,
+            "max (inc)": 0.341896,
+            "sumsqr (inc)": 0.116893,
+            "calls": 1
+        },
+        "children": [
+            {
+            "frame": {
+                "name": "main",
+                "type": "function",
+                "rank": 0
+            },
+            "metrics": {
+                "time": 0.000059,
+                "time (inc)": 0.000632,
+                "min (inc)": 0.000632,
+                "max (inc)": 0.000632,
+                "sumsqr (inc)": 0,
+                "calls": 1
+            },
+            "children": [
+                {
+                "frame": {
+                    "name": "root_node",
+                    "type": "function",
+                    "rank": 0
+                },
+                "metrics": {
+                    "time": 0.000217,
+                    "time (inc)": 0.000452,
+                    "min (inc)": 0.000452,
+                    "max (inc)": 0.000452,
+                    "sumsqr (inc)": 0,
+                    "calls": 1
+                },
+                "children": [
+                    {
+                    "frame": {
+                        "name": "MPI_Recv",
+                        "type": "function",
+                        "rank": 0
+                    },
+                    "metrics": {
+                        "time": 0.000027,
+                        "time (inc)": 0.000027,
+                        "min (inc)": 0.000002,
+                        "max (inc)": 0.000018,
+                        "sumsqr (inc)": 0,
+                        "calls": 3
+                    }
+                    },
+                    {
+                    "frame": {
+                        "name": "do_work",
+                        "type": "function",
+                        "rank": 0
+                    },
+                    "metrics": {
+                        "time": 0.000111,
+                        "time (inc)": 0.000111,
+                        "min (inc)": 0.000111,
+                        "max (inc)": 0.000111,
+                        "sumsqr (inc)": 0,
+                        "calls": 1
+                    }
+                    },
+                    {
+                    "frame": {
+                        "name": "MPI_Send",
+                        "type": "function",
+                        "rank": 0
+                    },
+                    "metrics": {
+                        "time": 0.000019,
+                        "time (inc)": 0.000019,
+                        "min (inc)": 0.000002,
+                        "max (inc)": 0.000008,
+                        "sumsqr (inc)": 0,
+                        "calls": 6
+                    }
+                    },
+                    {
+                    "frame": {
+                        "name": "get_next_work_item",
+                        "type": "function",
+                        "rank": 0
+                    },
+                    "metrics": {
+                        "time": 0.000068,
+                        "time (inc)": 0.000079,
+                        "min (inc)": 0.000006,
+                        "max (inc)": 0.000031,
+                        "sumsqr (inc)": 0,
+                        "calls": 8
+                    },
+                    "children": [
+                        {
+                        "frame": {
+                            "name": "get_work_items",
+                            "type": "function",
+                            "rank": 0
+                        },
+                        "metrics": {
+                            "time": 0.000011,
+                            "time (inc)": 0.000011,
+                            "min (inc)": 0.000011,
+                            "max (inc)": 0.000011,
+                            "sumsqr (inc)": 0,
+                            "calls": 1
+                        }
+                        }
+                    ]
+                    }
+                ]
+                },
+                {
+                "frame": {
+                    "name": "MPI_Barrier",
+                    "type": "function",
+                    "rank": 0
+                },
+                "metrics": {
+                    "time": 0.00012,
+                    "time (inc)": 0.00012,
+                    "min (inc)": 0.000017,
+                    "max (inc)": 0.000103,
+                    "sumsqr (inc)": 0,
+                    "calls": 2
+                }
+                }
+            ]
+            }
+        ]
+        }
 
     Return:
         (GraphFrame): graphframe containing data from dictionaries
