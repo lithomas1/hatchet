@@ -266,19 +266,26 @@ class Chopper:
         self, graphframe, start_node=None, metric=None, threshold=0.5, callpath=[]
     ):
         """Returns the hot_path function.
-        Inputs:
-         - start_node (optional): Start node of the hot path can be given.
-         Default: the root node that has the largest metric value.
-         - metric: A numerical metric on the dataframe.
-         Default: graphframe.default_metric
-         - threshold: Threshold for parent-child comparison (parent <= child/2).
-         Default: 0.5
+
+        :param graphframe: The input graphframe to calculate hotpath on.
+        :type graphframe: class:`hatchet.GraphFrame`
+        :param start_node: Start node of the hot path can be given.
+            Default: the root node that has the largest metric value.
+        :type start_node: class:``
+        :param metric: A numerical metric on the dataframe.
+            Default: graphframe.default_metric
+        :type metric: class:``
+        :param threshold: Threshold for parent-child comparison (parent <= child/2).
+            Default: 0.5
+        :type threshold: class:`float`
+
         Output:
          - hot_path: list of nodes, starting from the start node to the hot node.
 
-        Example:
-        root_node = graphframe.graph.roots[0]
-        graphframe.hot_path(root_node)
+        Example::
+
+            root_node = graphframe.graph.roots[0]
+            graphframe.hot_path(root_node)
         """
 
         def find_hot_path(graphframe, parent, metric, threshold, callpath):
@@ -342,17 +349,23 @@ class Chopper:
         groupby_function=None,
     ):
         """Creates a pivot table.
-        Inputs:
-         - graphframes: A list of graphframes.
-         - pivot_index: The metric in each graphframe's metadata used to index the pivot table.
-         Default: num_processes
-         - columns: The non-numerical metric over which the pivot table's column values are aggregated.
-         Default: name
-         - metric: The numerical metric which is aggregated to form the pivot table's column values.
-         Default: time
-         - threshold: The threshold for filtering metric rows of the graphframes.
+
+        :param graphframes: A list of graphframes.
+        :type graphframes: class:`list`
+        :param pivot_index: The metric in each graphframe's metadata used to index the pivot table.
+          Default: num_processes
+        :type pivot_index: class:`str`
+        :param columns: The non-numerical metric over which the pivot table's column values are aggregated.
+          Default: name
+        :type columns: class:`list`
+        :param metric: The numerical metric which is aggregated to form the pivot table's column values.
+          Default: time
+        :type metric: class:`str`
+        :param threshold: The threshold for filtering metric rows of the graphframes.
+        :type threshold: class:`float`
+
         Output:
-         - a pivot table
+        - a pivot table
         """
 
         assert (
@@ -422,19 +435,26 @@ class Chopper:
     ):
         """
         Calculates the speedup and efficiency values.
-        Inputs:
-         - graphframes: A list of graphframes.
-         - weak: True for weak scaling experiments.
-         - strong: True for strong scaling experiments.
-         - efficiency: True if the user wants to calculate efficiency.
-         - strong: True if the user wants to calculate speedup.
-         - pivot_index: The metric in each graphframe's metadata used to do calculations.
-         Default: num_processes.
-         - metric: The numerical metric for which we want to calculate speedup and efficiency.
-         Default: time
-         - threshold: The threshold for filtering metric rows of the graphframes.
+
+        :param graphframes: A list of graphframes.
+        :type graphframes: class:`list`
+        :param weak: True for weak scaling experiments.
+        :type weak: class:`bool`
+        :param strong: True for strong scaling experiments.
+        :type strong: class:`bool`
+        :param efficiency: True if the user wants to calculate efficiency.
+        :type efficiency: class:`bool`
+        :param pivot_index: The metric in each graphframe's metadata used to do calculations.
+            Default: num_processes.
+        :type: class:`str`
+        :param metric: The numerical metric for which we want to calculate speedup and efficiency.
+            Default: time
+        :type: class:`list`
+        :param threshold: The threshold for filtering metric rows of the graphframes.
+        :type: class:`float`
+
         Output:
-         - a new dataframe that stores speedup and efficiency values.
+        - a new dataframe that stores speedup and efficiency values.
         """
         from .graphframe import GraphFrame
 

@@ -9,3 +9,5 @@
 from .graphframe import GraphFrame
 from .query import QueryMatcher
 from .chopper import Chopper
+
+from .version import __version__, __version_info__
